@@ -1,28 +1,33 @@
 * {
-	font-family: "Roboto", sans-serif;
+  font-family: "Roboto", sans-serif;
 }
 
 body {
-	text-align: center;
-	/* background-color: rgba(233, 51, 141); */
+  text-align: center;
+  /* background-color: rgba(233, 51, 141); */
 }
 
 #p5-canvas {
-	width: 640px;
+  width: 640px;
 
-	position: relative;
-	margin: 1rem auto;
+  position: relative;
+  margin: 1rem auto;
 }
 
 #play-btn {
-	position: absolute;
-	left: 270px;
-	top: 220px;
-	border: 1px solid;
-	font-size: 1rem;
-	height: 40px;
-	width: 100px;
-	color: rgba(159, 112, 208, 1);
+  position: absolute;
+  left: 270px;
+  top: 220px;
+  border: 1px solid;
+  font-size: 1rem;
+  height: 40px;
+  width: 100px;
+  color: rgba(159, 112, 208, 1);
+}
+
+h1 {
+  margin: 1rem auto 0.5rem auto;
+  font-size: 4rem;
 }
 
 h1,
@@ -30,5 +35,5 @@ h2,
 h3,
 p,
 a {
-	color: rgba(159, 112, 208, 1);
+  color: rgba(159, 112, 208, 1);
 }
