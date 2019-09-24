@@ -27,6 +27,10 @@ let lastTimestamp;
 
 let bgCol;
 let synth = new Tone.Synth().toMaster();
+let player = new Tone.Player({
+  url: "./assets/FWDL.[mp3|ogg]",
+  loop: true
+}).toMaster();
 
 function setup() {
   const canvas = createCanvas(640, 480);
@@ -42,6 +46,7 @@ function setup() {
   poseNet.on("pose", results => {
     poses = results;
   });
+
   video.hide();
 }
 
@@ -143,7 +148,11 @@ function fail() {
   timeLimit = 5000;
   targetRadius = 40;
   playing = false;
+
   playBtn.style.display = "block";
+
+  synth.triggerAttackRelease("C3", "16n");
+  player.stop();
 }
 
 // interactive events
@@ -154,6 +163,7 @@ playBtn.addEventListener("click", () => {
   playing = true;
   lastTimestamp = millis();
   synth.triggerAttackRelease("C4", "16n");
+  player.start();
 });
 
 // utilities
