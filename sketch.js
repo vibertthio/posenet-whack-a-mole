@@ -1,4 +1,4 @@
-//  colors
+//  colors: https://www.color-hex.com/color-palette/83132
 // 	(67,174,112)
 //	(255,255,255)
 //	(255,154,0)
@@ -9,7 +9,7 @@ let video;
 let poseNet;
 let poses = [];
 
-// game
+// Game
 let playing = false;
 let score = 0;
 let target = { x: 50, y: 50 };
@@ -25,7 +25,12 @@ let minLimit = 1000;
 let timeLimit = 5000;
 let lastTimestamp;
 
-let bgCol;
+// DOM Tree
+
+const playBtn = document.getElementById("play-btn");
+
+// Sounds
+
 let synth = new Tone.Synth().toMaster();
 let player = new Tone.Player({
   url: "./assets/FWDL.[mp3|ogg]",
@@ -49,8 +54,6 @@ function setup() {
 
   video.hide();
 }
-
-function initColor() {}
 
 function draw() {
   translate(width, 0);
@@ -143,7 +146,6 @@ function resetTiming() {
   timeLimit = Math.max(minLimit, timeLimit * 0.97);
 }
 
-const playBtn = document.getElementById("play-btn");
 function fail() {
   timeLimit = 5000;
   targetRadius = 40;
