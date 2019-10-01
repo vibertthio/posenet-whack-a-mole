@@ -53,6 +53,7 @@ function setup() {
   });
 
   video.hide();
+  test();
 }
 
 function draw() {
@@ -213,4 +214,11 @@ function drawSkeleton() {
       );
     }
   }
+}
+
+// api
+async function test() {
+  const response = await fetch("https://simple-ragamuffin.glitch.me/scores");
+  const myJson = await response.json();
+  console.log(JSON.stringify(myJson));
 }
