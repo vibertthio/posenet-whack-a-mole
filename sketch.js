@@ -11,8 +11,10 @@ let poses = [];
 
 // Game
 let playing = false;
+let gameState = 0;
 let score = 0;
 let target = { x: 50, y: 50 };
+let records = [];
 
 let animationCount = 0;
 let animationPosition = { x: 50, y: 50 };
@@ -28,21 +30,66 @@ let lastTimestamp;
 // DOM Tree
 
 const playBtn = document.getElementById("play-btn");
+const submitScoreDiv = document.getElementById("submit");
+const leadersDiv = document.getElementById("leaders");
+const submitButton = document.getElementById("submit-button");
+const playAgainButton = document.getElementById("play-again-button");
+playBtn.addEventListener("click", () => {
+  playBtn.style.display = "none";
+  gameState = 1;
+  lastTimestamp = millis();
+  updateScore(0);
+
+  // music
+  synth.triggerAttackRelease("C4", "16n");
+  player.start();
+});
+submitButton.addEventListener("click", async () => {
+  submitButton.textContent = "sending...";
+  const name = document.getElementById("name").value;
+
+  const response = await fetch("https://simple-ragamuffin.glitch.me/scores", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ name, score })
+  });
+  records = await response.json();
+  updateLeaders();
+
+  submitButton.textContent = "Send";
+  submitScoreDiv.style.display = "none";
+  leadersDiv.style.display = "block";
+  document.getElementById("name").value = "";
+  gameState = 2;
+});
+playAgainButton.addEventListener("click", () => {
+  leadersDiv.style.display = "none";
+  gameState = 1;
+  lastTimestamp = millis();
+  updateScore(0);
+
+  // music
+  synth.triggerAttackRelease("C4", "16n");
+  player.start();
+});
 
 // Sounds
 
-let synth = new Tone.Synth().toMaster();
-let player = new Tone.Player({
-  url: "./assets/FWDL.[mp3|ogg]",
-  loop: true
-}).toMaster();
+let synth;
+let player;
 
 function setup() {
+  getRecords();
+
   const canvas = createCanvas(640, 480);
   canvas.parent("p5-canvas");
   fill(255, 255, 255);
   rect(-1, -1, width + 2, height + 2);
 
+  // posenet & webcam
   video = createCapture(VIDEO);
   video.size(width, height);
   poseNet = ml5.poseNet(video, () => {
@@ -53,7 +100,13 @@ function setup() {
   });
 
   video.hide();
-  test();
+
+  // music
+  synth = new Tone.Synth().toMaster();
+  player = new Tone.Player({
+    url: "./assets/FWDL.[mp3|ogg]",
+    loop: true
+  }).toMaster();
 }
 
 function draw() {
@@ -64,7 +117,7 @@ function draw() {
   fill(255, 255, 255, 200);
   rect(-1, -1, width + 2, height + 2);
 
-  if (playing) {
+  if (gameState === 1) {
     drawNose();
     drawTarget();
     drawTiming();
@@ -150,30 +203,20 @@ function resetTiming() {
 function fail() {
   timeLimit = 5000;
   targetRadius = 40;
-  playing = false;
 
-  playBtn.style.display = "block";
+  gameState = 2;
+  submitScoreDiv.style.display = "block";
 
   synth.triggerAttackRelease("C3", "16n");
   player.stop();
 }
-
-// interactive events
-
-playBtn.addEventListener("click", () => {
-  playBtn.style.display = "none";
-  updateScore(0);
-  playing = true;
-  lastTimestamp = millis();
-  synth.triggerAttackRelease("C4", "16n");
-  player.start();
-});
 
 // utilities
 
 function updateScore(s) {
   score = s;
   document.getElementById("score").innerHTML = `score: ${s}`;
+  document.getElementById("submit-score").innerHTML = s;
 }
 
 function drawNose() {
@@ -217,8 +260,22 @@ function drawSkeleton() {
 }
 
 // api
-async function test() {
-  const response = await fetch("https://simple-ragamuffin.glitch.me/scores");
-  const myJson = await response.json();
-  console.log(JSON.stringify(myJson));
+async function getRecords() {
+  const response = await fetch("https://simple-ragamuffin.glitch.me/leaders");
+  records = await response.json();
+  updateLeaders();
+}
+
+function updateLeaders() {
+  const ol = document.getElementById("leaders-ol");
+  // clear children
+  while (ol.firstChild) {
+    ol.removeChild(ol.firstChild);
+  }
+
+  records.forEach(record => {
+    const li = document.createElement("li");
+    ol.appendChild(li);
+    li.innerHTML = `${record.name} <span class="score">${record.score}</span>`;
+  });
 }

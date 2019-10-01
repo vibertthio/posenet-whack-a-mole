@@ -25,6 +25,22 @@ body {
   color: rgba(159, 112, 208, 1);
 }
 
+.btn {
+  border: 1px solid;
+  font-size: 1rem;
+  height: 40px;
+  width: 100px;
+  color: rgba(159, 112, 208, 1);
+}
+
+#submit-button {
+  color: rgba(67, 174, 112, 1);
+}
+
+#nope-button {
+  color: rgba(67, 174, 112, 0.5);
+}
+
 h1 {
   margin: 1rem auto 0.5rem auto;
   font-size: 4rem;
@@ -36,4 +52,74 @@ h3,
 p,
 a {
   color: rgba(159, 112, 208, 1);
+}
+
+#submit {
+  display: none;
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  top: 25%;
+  left: 25%;
+  background: rgba(255, 255, 255, 1);
+  border: 1px solid;
+  border-color: rgba(159, 112, 208, 1);
+}
+
+#leaders {
+  display: none;
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  top: 25%;
+  left: 25%;
+  background: rgba(255, 255, 255, 1);
+  border: 1px solid;
+  border-color: rgba(159, 112, 208, 1);
+}
+
+#name {
+  width: 50%;
+  padding: 1rem;
+  outline: none;
+  height: 2rem;
+  border: 1px solid rgba(159, 112, 208, 1);
+  border-radius: 4px;
+  font-size: 1rem;
+  color: #43aea6;
+}
+
+::placeholder {
+  color: #43aea6;
+  opacity: 0.5; /* Firefox */
+}
+
+#leaders-ol {
+  width: 70%;
+  margin: 2rem 1rem 2.5rem 1rem;
+  list-style: none;
+  counter-reset: li;
+}
+
+li {
+  text-align: left;
+  counter-increment: li;
+  color: #43aea6;
+}
+
+li:before {
+  content: counter(li);
+  display: inline-block;
+  width: 0.5em;
+  margin-right: 1rem;
+  color: rgba(159, 112, 208, 1);
+}
+
+.score {
+  float: right;
+  color: #ff9a00;
+}
+
+#submit-score {
+  color: #ff9a00;
 }

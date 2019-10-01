@@ -29,6 +29,29 @@
     <p>play whack a mole with your nose👃, powered by PoseNet</p>
     <div id="p5-canvas">
       <button id="play-btn">loading</button>
+      <div id="submit">
+        <div>
+          <h2>Submit Score</h2>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            required
+            minlength="2"
+            maxlength="40"
+            size="15"
+            placeholder="name"
+          />
+        </div>
+        <h2><span id="submit-score">5</span></h2>
+        <button class="btn" id="submit-button">Send</button>
+        <button class="btn" id="nope-button">Nope</button>
+      </div>
+      <div id="leaders">
+        <h2>Top Players</h2>
+        <ol id="leaders-ol"></ol>
+        <button class="btn" id="play-again-button">Play Again</button>
+      </div>
     </div>
 
     <h2 id="score">score: 0</h2>
