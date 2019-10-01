@@ -33,6 +33,7 @@ const playBtn = document.getElementById("play-btn");
 const submitScoreDiv = document.getElementById("submit");
 const leadersDiv = document.getElementById("leaders");
 const submitButton = document.getElementById("submit-button");
+const nopeButton = document.getElementById("nope-button");
 const playAgainButton = document.getElementById("play-again-button");
 playBtn.addEventListener("click", () => {
   playBtn.style.display = "none";
@@ -74,6 +75,13 @@ playAgainButton.addEventListener("click", () => {
   // music
   synth.triggerAttackRelease("C4", "16n");
   player.start();
+});
+nopeButton.addEventListener("click", () => {
+  submitButton.textContent = "Send";
+  submitScoreDiv.style.display = "none";
+  leadersDiv.style.display = "block";
+  document.getElementById("name").value = "";
+  gameState = 2;
 });
 
 // Sounds
