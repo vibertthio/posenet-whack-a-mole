@@ -219,7 +219,7 @@ function fail() {
   player.stop();
 }
 
-// utilities
+/** utils **/
 
 function updateScore(s) {
   score = s;
@@ -267,7 +267,8 @@ function drawSkeleton() {
   }
 }
 
-// api
+/** api **/
+
 async function getRecords() {
   const response = await fetch("https://simple-ragamuffin.glitch.me/leaders");
   records = await response.json();

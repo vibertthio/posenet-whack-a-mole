@@ -4,9 +4,25 @@
     <title>Whack a Mole</title>
     <link rel="stylesheet" type="text/css" href="style.css" />
     <link
-      href="https://fonts.googleapis.com/css?family=Roboto&display=swap"
+      href="https://fonts.googleapis.com/css?family=IBM+Plex+Mono|VT323&display=swap"
       rel="stylesheet"
     />
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-102358307-2"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "UA-102358307-2");
+    </script>
+
     <!-- favicon -->
     <link
       rel="icon"
@@ -26,9 +42,17 @@
   <body>
     <h1>Whack a Mole</h1>
 
-    <p>play whack a mole with your nose👃, powered by PoseNet</p>
+    <p>
+      Play whack a mole with your nose👃, powered by
+      <a
+        href="https://github.com/tensorflow/tfjs-models/tree/master/posenet"
+        target="_blank"
+      >
+        PoseNet</a
+      >.
+    </p>
     <div id="p5-canvas">
-      <button id="play-btn">loading</button>
+      <button class="btn" id="play-btn">loading</button>
       <div id="submit">
         <div>
           <h2>Submit Score</h2>
@@ -55,7 +79,11 @@
     </div>
 
     <h2 id="score">score: 0</h2>
-    <p><a href="https://vibertthio.com/portfolio">vibertthio.com</a></p>
+    <p>
+      <a href="https://vibertthio.com/portfolio" target="_blank"
+        >vibertthio.com</a
+      >
+    </p>
     <script src="sketch.js"></script>
   </body>
 </html>

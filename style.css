@@ -1,5 +1,13 @@
+/* color pallete
+https://www.color-hex.com/color-palette/83132
+(67,174,112)
+(255,255,255)
+(255,154,0)
+(67,174,166)
+(159,112,208) */
+
 * {
-  font-family: "Roboto", sans-serif;
+  font-family: "IBM Plex Mono", monospace;
 }
 
 body {
@@ -16,29 +24,33 @@ body {
 
 #play-btn {
   position: absolute;
-  left: 270px;
+  left: 260px;
   top: 220px;
-  border: 1px solid;
-  font-size: 1rem;
-  height: 40px;
-  width: 100px;
-  color: rgba(159, 112, 208, 1);
 }
 
 .btn {
   border: 1px solid;
   font-size: 1rem;
   height: 40px;
-  width: 100px;
+  width: 120px;
   color: rgba(159, 112, 208, 1);
+  transition: color 0.3s;
+  transition: background-color 0.3s;
+}
+
+.btn:hover {
+  border: 1px solid rgba(159, 112, 208, 1);
+  font-size: 1rem;
+  color: #fff;
+  background-color: rgba(159, 112, 208, 1);
 }
 
 #submit-button {
-  color: rgba(67, 174, 112, 1);
+  /* color: rgba(67, 174, 112, 1); */
 }
 
 #nope-button {
-  color: rgba(67, 174, 112, 0.5);
+  /* color: rgba(67, 174, 112, 0.5); */
 }
 
 h1 {
@@ -122,4 +134,16 @@ li:before {
 
 #submit-score {
   color: #ff9a00;
+}
+
+a {
+  background-color: #fff;
+  color: #ff9a00;
+  padding: 2px;
+  transition: color 0.5s;
+}
+a:hover {
+  color: #fff;
+  background-color: #ff9a00;
+  text-decoration: none;
 }
