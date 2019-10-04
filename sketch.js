@@ -1,33 +1,33 @@
-//  colors: https://www.color-hex.com/color-palette/83132
-// 	(67,174,112)
-//	(255,255,255)
-//	(255,154,0)
-//	(67,174,166)
-//	(159,112,208)
-
 let video;
 let poseNet;
 let poses = [];
 
-// Game
 let playing = false;
+let loading = true;
 let gameState = 0;
 let score = 0;
-let target = { x: 50, y: 50 };
+let target;
 let records = [];
 
 let animationCount = 0;
+let animationColor;
 let animationPosition = { x: 50, y: 50 };
 
 let nose = { x: -1000, y: -1000 };
 let minRadius = 13;
-let targetRadius = 50;
+let targetRadius = 60;
+let radiusDecayRate = 0.97;
 
 let minLimit = 1000;
 let timeLimit = 5000;
+let timeLimitDecayRate = 0.97;
 let lastTimestamp;
+let ratio = 1;
 
-// DOM Tree
+let timingWidth = 20;
+
+let synth;
+let player;
 
 const playBtn = document.getElementById("play-btn");
 const submitScoreDiv = document.getElementById("submit");
@@ -35,64 +35,69 @@ const leadersDiv = document.getElementById("leaders");
 const submitButton = document.getElementById("submit-button");
 const nopeButton = document.getElementById("nope-button");
 const playAgainButton = document.getElementById("play-again-button");
-playBtn.addEventListener("click", () => {
-  playBtn.style.display = "none";
-  gameState = 1;
-  lastTimestamp = millis();
-  updateScore(0);
 
-  // music
-  synth.triggerAttackRelease("C4", "16n");
-  player.start();
-});
-submitButton.addEventListener("click", async () => {
-  submitButton.textContent = "sending...";
-  const name = document.getElementById("name").value;
+StartAudioContext(Tone.context, "#play-btn").then(() => {
+  console.log("audio context started.");
+  playBtn.addEventListener("click", () => {
+    if (loading) {
+      return;
+    }
 
-  const response = await fetch("https://simple-ragamuffin.glitch.me/scores", {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ name, score })
+    playBtn.style.display = "none";
+    gameState = 1;
+    lastTimestamp = millis();
+    updateScore(0);
+
+    // music
+    synth.triggerAttackRelease("C4", "16n");
+    player.start();
   });
-  records = await response.json();
-  updateLeaders();
+  submitButton.addEventListener("click", async () => {
+    submitButton.textContent = "sending...";
+    const name = document.getElementById("name").value;
 
-  submitButton.textContent = "Send";
-  submitScoreDiv.style.display = "none";
-  leadersDiv.style.display = "block";
-  document.getElementById("name").value = "";
-  gameState = 2;
+    const response = await fetch("https://simple-ragamuffin.glitch.me/scores", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ name, score })
+    });
+    records = await response.json();
+    updateLeaders();
+
+    submitButton.textContent = "Send";
+    submitScoreDiv.style.display = "none";
+    leadersDiv.style.display = "block";
+    document.getElementById("name").value = "";
+    gameState = 2;
+  });
+  playAgainButton.addEventListener("click", () => {
+    leadersDiv.style.display = "none";
+    gameState = 1;
+    lastTimestamp = millis();
+    updateScore(0);
+
+    // music
+    synth.triggerAttackRelease("C4", "16n");
+    player.start();
+  });
+  nopeButton.addEventListener("click", () => {
+    submitButton.textContent = "Send";
+    submitScoreDiv.style.display = "none";
+    leadersDiv.style.display = "block";
+    document.getElementById("name").value = "";
+    gameState = 2;
+  });
 });
-playAgainButton.addEventListener("click", () => {
-  leadersDiv.style.display = "none";
-  gameState = 1;
-  lastTimestamp = millis();
-  updateScore(0);
-
-  // music
-  synth.triggerAttackRelease("C4", "16n");
-  player.start();
-});
-nopeButton.addEventListener("click", () => {
-  submitButton.textContent = "Send";
-  submitScoreDiv.style.display = "none";
-  leadersDiv.style.display = "block";
-  document.getElementById("name").value = "";
-  gameState = 2;
-});
-
-// Sounds
-
-let synth;
-let player;
 
 function setup() {
   getRecords();
+  target = { x: 0, y: 0 };
 
   const canvas = createCanvas(640, 480);
+  resetTarget();
   canvas.parent("p5-canvas");
   fill(255, 255, 255);
   rect(-1, -1, width + 2, height + 2);
@@ -101,7 +106,8 @@ function setup() {
   video = createCapture(VIDEO);
   video.size(width, height);
   poseNet = ml5.poseNet(video, () => {
-    select("#play-btn").html("play");
+    playBtn.innerHTML = "play";
+    loading = false;
   });
   poseNet.on("pose", results => {
     poses = results;
@@ -141,19 +147,35 @@ function check() {
     animationPosition.x = target.x;
     animationPosition.y = target.y;
     animationCount = 100;
+    animationColor =
+      ratio < 0.3
+        ? color(255, 10, 10)
+        : ratio < 0.6
+        ? color(255, 154, 0)
+        : color(67, 174, 112);
 
-    synth.triggerAttackRelease("A4", "16n");
-    updateScore(score + 1);
+    let addedScore = ratio < 0.3 ? 1 : ratio < 0.6 ? 2 : 3;
+    if (addedScore > 2) {
+      synth.triggerAttackRelease("C5", "16n");
+      synth.triggerAttackRelease("E5", "16n", "+0.1");
+    } else if (addedScore > 1) {
+      synth.triggerAttackRelease("A4", "32n");
+    } else {
+      synth.triggerAttackRelease("F4", "32n");
+    }
+    updateScore(score + addedScore);
     resetTarget();
     resetTiming();
   }
 }
 
 function resetTarget() {
-  targetRadius = Math.max(minRadius, targetRadius * 0.96);
-
-  target.x = map(Math.random(), 0, 1, 0.05 * width, 0.95 * width);
-  target.y = map(Math.random(), 0, 1, 0.05 * height, 0.95 * height);
+  targetRadius = Math.max(minRadius, targetRadius * radiusDecayRate);
+  const { x, y } = target;
+  while (dist(x, y, target.x, target.y) < width * 0.3) {
+    target.x = map(Math.random(), 0, 1, 0.1 * width, 0.95 * width);
+    target.y = map(Math.random(), 0, 1, 0.05 * height, 0.95 * height);
+  }
 }
 
 function drawTarget() {
@@ -170,12 +192,11 @@ function drawTarget() {
 
   if (animationCount > 0) {
     push();
-    const progress = pow((100 - animationCount) * 0.01, 0.2);
+    const progress = pow((100 - animationCount) * 0.01, 0.1);
     const alpha = 255 * (1 - progress);
-    fill(255, 154, 0, alpha);
+    animationColor.setAlpha(alpha);
+    fill(animationColor);
     noStroke();
-    // stroke(159, 112, 208, alpha);
-    // strokeWeight(4);
     translate(animationPosition.x, animationPosition.y);
     ellipse(0, 0, 50 * progress, 50 * progress);
     pop();
@@ -185,27 +206,55 @@ function drawTarget() {
 
 function drawTiming() {
   push();
+  const shrink = 0.9;
+  const barH = height * shrink;
+  const alpha = 180;
+
+  translate(timingWidth, height * (1 - shrink) * 0.5);
+
+  noStroke();
+  fill(255, 255, 255);
+  rect(0, 0, timingWidth, barH);
 
   const timeElapsed = millis() - lastTimestamp;
   if (timeElapsed > timeLimit) {
     fail();
   }
-  const ratio = 1 - timeElapsed / timeLimit;
-  const h = height * ratio;
+  ratio = 1 - timeElapsed / timeLimit;
+  const h = barH * ratio;
+
   if (ratio < 0.3) {
-    fill(255, 10, 10);
+    fill(255, 10, 10, alpha);
+  } else if (ratio < 0.6) {
+    fill(255, 154, 0, alpha);
   } else {
-    fill(67, 174, 112);
+    fill(67, 174, 112, alpha);
   }
   noStroke();
-  rect(0, height - h, 10, h);
+  rect(0, barH, timingWidth, -h);
+
+  push();
+  translate(timingWidth * 1.5, barH - h);
+
+  beginShape();
+  vertex(0, 0);
+  vertex(20, 10);
+  vertex(20, -10);
+  endShape(CLOSE);
+  pop();
+
+  stroke(67, 174, 112);
+  // stroke(255, 255, 255);
+  strokeWeight(4);
+  noFill();
+  rect(0, 0, timingWidth, barH);
 
   pop();
 }
 
 function resetTiming() {
   lastTimestamp = millis();
-  timeLimit = Math.max(minLimit, timeLimit * 0.97);
+  timeLimit = Math.max(minLimit, timeLimit * timeLimitDecayRate);
 }
 
 function fail() {
@@ -218,8 +267,6 @@ function fail() {
   synth.triggerAttackRelease("C3", "16n");
   player.stop();
 }
-
-/** utils **/
 
 function updateScore(s) {
   score = s;
@@ -267,7 +314,7 @@ function drawSkeleton() {
   }
 }
 
-/** api **/
+// api
 
 async function getRecords() {
   const response = await fetch("https://simple-ragamuffin.glitch.me/leaders");
