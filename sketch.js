@@ -56,7 +56,7 @@ StartAudioContext(Tone.context, "#play-btn").then(() => {
     submitButton.textContent = "sending...";
     const name = document.getElementById("name").value;
 
-    const response = await fetch("https://simple-ragamuffin.glitch.me/scores", {
+    const response = await fetch("https://whack-mole.glitch.me/scores", {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -317,7 +317,7 @@ function drawSkeleton() {
 // api
 
 async function getRecords() {
-  const response = await fetch("https://simple-ragamuffin.glitch.me/leaders");
+  const response = await fetch("https://whack-mole.glitch.me/leaders");
   records = await response.json();
   updateLeaders();
 }
